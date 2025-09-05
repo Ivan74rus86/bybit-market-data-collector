@@ -56,7 +56,7 @@ def get_batch(symbol, interval='1', start_time=0, limit=1000):
         time.sleep(5 * 60)
         return get_batch(symbol, interval, start_time, limit)
     
-    except requests.exceptions.ConnectionResetError:
+    except ConnectionResetError:
         print('Connection reset by peer, Cooling down for 5 min...')
         time.sleep(5 * 60)
         return get_batch(symbol, interval, start_time, limit)
