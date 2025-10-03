@@ -100,8 +100,10 @@ def add_missing_minutes_df(df):
     return pd.DataFrame(historical_data_dict)
 
 
-def write_raw_to_parquet(df, full_path):
-    """takes raw df and writes a parquet to disk"""
+def process_raw_to_1m(df):
+    """Convert raw kline df (5m or 1m) into a 1m grid dataframe with proper dtypes.
+    Returns the processed dataframe without writing to disk.
+    """
 
     df_copy = df.copy()
     df_copy = set_dtypes_compressed(df_copy)
@@ -117,7 +119,24 @@ def write_raw_to_parquet(df, full_path):
     df_copy = add_missing_minutes_df(df_copy)
     df_copy.reset_index(drop=True, inplace=True)
 
-    df_copy.to_parquet(full_path)
+    return df_copy
+
+
+def write_processed_to_parquet(df_processed, full_path):
+    """Write an already processed 1m dataframe to Parquet with compression."""
+    df_processed.to_parquet(
+        full_path,
+        engine='pyarrow',
+        compression='zstd',
+        compression_level=7,
+        use_dictionary=True
+    )
+
+
+def write_raw_to_parquet(df, full_path):
+    """Original helper retained for convenience: process then write."""
+    df_processed = process_raw_to_1m(df)
+    write_processed_to_parquet(df_processed, full_path)
 
 
 def groom_data(dirname='data'):

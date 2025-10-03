@@ -28,7 +28,7 @@ LABELS = [
 
 category = 'spot'
 
-def get_batch(symbol, interval='1', start_time=0, limit=1000):
+def get_batch(symbol, interval='10', start_time=0, limit=1000):
     """Use a GET request to retrieve a batch of candlesticks. Process the JSON into a pandas
     dataframe and return it. If not successful, return an empty dataframe.
     """
@@ -74,7 +74,7 @@ def get_batch(symbol, interval='1', start_time=0, limit=1000):
     print(f'Got erroneous response back: {response}')
     return pd.DataFrame([])
 
-def all_candles_to_csv(base, quote, interval='1'):
+def all_candles_to_csv(base, quote, interval='10'):
     """Collect a list of candlestick batches with all candlesticks of a trading pair,
     concat into a dataframe and write it to CSV.
     """
@@ -156,7 +156,7 @@ def main():
 
     # get all pairs currently available
     all_symbols = pd.DataFrame(requests.get(f'{API_BASE}market/instruments-info?category=' + category).json()['result']['list'])
-    all_symbols = all_symbols[all_symbols['quoteCoin'].isin(['USDT', 'USDC'])]
+    all_symbols = all_symbols[all_symbols['quoteCoin'] == 'USDT']
     blacklist = ['EUR', 'GBP', 'AUD', 'BCHABC', 'BCHSV', 'DAI', 'PAX', 'WBTC', 'BUSD', 'TUSD', 'UST', 'USDC', 'USDSB', 'USDS', 'SUSD', 'USDP']
     for coin in blacklist:
         all_symbols = all_symbols[all_symbols['baseCoin'] != coin]
